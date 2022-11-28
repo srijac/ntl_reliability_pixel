@@ -1,0 +1,12 @@
+tensorflow_gpu==2.6.0
+keras==2.6.0
+protobuf~=3.19.0
+h5py
+numpy
+python-rclone
+scipy
+pandas
+sklearn
+matplotlib
+statsmodels
+zarr

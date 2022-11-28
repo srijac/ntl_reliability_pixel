@@ -1,0 +1,6 @@
+Docker/s3*.txt
+Docker/fua*.txt
+Docker/rclone*
+*.yaml
+Docker/tile_to_poly.json
+root_test
