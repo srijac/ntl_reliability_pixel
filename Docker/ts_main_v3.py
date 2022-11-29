@@ -69,6 +69,7 @@ def min_max_norm(data,start, tr_ts):
     
     return scaler, normalized
 
+#def train_forecast(n,tile,end_d,end_m,end_y,path_obs, path_date,w_dir_wt, w_dir_fc,w_dir_comp):
 def train_forecast(n,tile,end_d,end_m,end_y,path_obs, path_date,w_dir_wt, w_dir_fc,w_dir_comp):
     #df = pd.read_csv('files_read/'+n,sep='\s+',header=None)
     #path=os.path.join(r_dir_path,n)
@@ -318,7 +319,7 @@ def forecast_city_list(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y, zarr
     print('--------------------------')
     print('computing metrics')
     #for n in names:
-    compute_metrics(poly_id, tile,end_d,end_m,end_y, path_obs,path_date, eval_dates)
+    #compute_metrics(poly_id, tile,end_d,end_m,end_y, path_obs,path_date, eval_dates)
     
     
 '''if __name__ == '__main__':
