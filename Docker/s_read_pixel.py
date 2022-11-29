@@ -16,7 +16,9 @@ from shutil import rmtree
 import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
+print(tf.__version__)
 from ts_main_v3 import *
+
 
 #tile_zarr, pix_r,pix_c, gf_ntl, global_r, global_c
 
