@@ -6,7 +6,7 @@ numpy
 python-rclone
 scipy
 pandas
-sklearn
+scikit-learn
 matplotlib
 statsmodels
 zarr
