@@ -70,25 +70,28 @@ def min_max_norm(data,start, tr_ts):
     return scaler, normalized
 
 #def train_forecast(n,tile,end_d,end_m,end_y,path_obs, path_date,w_dir_wt, w_dir_fc,w_dir_comp):
-def train_forecast(n,tile,end_d,end_m,end_y,path_obs, path_date,w_dir_wt, w_dir_fc,w_dir_comp):
+def train_forecast(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y, end_date_idx,zarr_date, ts, w_dir_wt, w_dir_fc,w_dir_comp):
     #df = pd.read_csv('files_read/'+n,sep='\s+',header=None)
     #path=os.path.join(r_dir_path,n)
     '''print('path:',path)
     print('path:',path)
     print('n is:',n)'''
     #UA=(n.split('_'))[1]
-    UA=n
+    #UA=n
     #tile=(n.split('_'))[2]
-    print('CURRENT UA, tile:', UA, tile)
-    print('path3:',path_obs)
+    print('CURRENT UA, tile:', tile)
+    #print('path3:',path_obs)
     #date_file=os.path.join(path_dates,str('fua_'+UA+'_'+tile+'_date.npy'))
     #print('date file:',date_file)
     #df = pd.read_csv(str(path),sep='\s+',header=None)
-    df=np.load(path_obs)
+    #df=np.load(path_obs)
+    df=ts
+    print('TIME SERIES TS L:', ts.shape)
     
     #ua_list=training_len.iloc[:,0]
     #print('UA LIST:', ua_list)
-    date=np.load(path_date)
+    #date=np.load(path_date)
+    date=zarr_date
     '''print('tr 0:',training_len.iloc[:,0])
     print('tr 1:',training_len.iloc[:,1])
     print('tr 2:',training_len.iloc[:,2])
@@ -116,11 +119,12 @@ def train_forecast(n,tile,end_d,end_m,end_y,path_obs, path_date,w_dir_wt, w_dir_
     
     print('END YEAR:', end_year)
     #num_val_ntl=df[:,0]
-    num_val_gf=df[:,3]
+    #num_val_gf=df[:,3]
+    num_val=ts
     
     
-    
-    yr=[]
+    print('TIME SERIES NUm_VAL L:', num_val.shape)
+    '''yr=[]
     month=[]
     day=[]
     for dd in np.arange(0, len(date)):
@@ -130,22 +134,29 @@ def train_forecast(n,tile,end_d,end_m,end_y,path_obs, path_date,w_dir_wt, w_dir_
     
     yr=np.asarray(yr)
     month=np.asarray(month)
-    day=np.asarray(day)
+    day=np.asarray(day)'''
     
     non_nan=[]
-    non_nan_yr=[]
-    non_nan_month=[]
-    non_nan_day=[]
+    #non_nan_yr=[]
+    #non_nan_month=[]
+    #non_nan_day=[]
     #print(len(num_val_30))
-    print('year',yr)
-    num_val_30=num_val_gf
-    print('num_val_30',num_val_gf[0] )
-    for i in np.arange(0,len(num_val_30)):
-        if (~np.isnan(num_val_30[i])):
-            non_nan.append(num_val_30[i])
-            non_nan_yr.append(yr[i])
-            non_nan_month.append(month[i])
-            non_nan_day.append(day[i])
+    #print('year',yr)
+    
+    #print('num_val_30',num_val_gf[0] )
+    
+    print('len num val:',len(num_val))
+    nan_count=0
+    for i in np.arange(0,len(num_val)):
+        if (~np.isnan(num_val[i])):
+            non_nan.append(num_val[i])
+        else:
+            #print('nan idx',i, num_val[i])
+            nan_count+=1
+    print('nan_count:',nan_count)
+    #non_nan_yr.append(yr[i])
+    #non_nan_month.append(month[i])
+    #non_nan_day.append(day[i])
     
     #d = {'day': (non_nan_day), 'month': (non_nan_month),'year':(non_nan_yr),'non-nan-ntl':non_nan}
     #d = (non_nan_day), (non_nan_month),(non_nan_yr),non_nan
@@ -155,12 +166,12 @@ def train_forecast(n,tile,end_d,end_m,end_y,path_obs, path_date,w_dir_wt, w_dir_
     print('UA:', UA)
     d_write.to_csv(os.path.join(w_dir_path,UA+'write_3.csv'))'''
     non_nan=np.asarray(non_nan)
-    non_nan_yr=np.asarray(non_nan_yr)
+    #non_nan_yr=np.asarray(non_nan_yr)
     
-    print(yr)
+    #print(yr)
     #year=df.loc[1:,3]
     #year=np.asarray(year)
-    start=np.asarray(np.where(non_nan_yr==2012))#changed from yr to non-nan-yr
+    '''start=np.asarray(np.where(non_nan_yr==2012))#changed from yr to non-nan-yr
     #start_nonnan=np.asarray(np.where(yr==2012))
     print('start array:', start)
     print('start',start[0,0])
@@ -173,8 +184,14 @@ def train_forecast(n,tile,end_d,end_m,end_y,path_obs, path_date,w_dir_wt, w_dir_
     #print('start, end', start, end)
     
     start_idx=start[0,0]
-    end_idx=end[0,-1]
-    print('UA, end year, end', UA, end_year, end_idx, non_nan[end_idx])
+    end_idx=end[0,-1]'''
+    start_idx=0
+    #end_idx=end_date_idx
+    end_idx=1200
+    
+    print('time-series around 1200:', non_nan[1180:1220])
+    print('TIME SERIES L:', non_nan.shape)
+    print('UA, end year, end', end_idx, non_nan[end_idx])
     #end_idx=457 #for electrification Korhogo
     #print('shape is:', yr)
     #print('yr 1:',yr[1])
@@ -211,11 +228,11 @@ def train_forecast(n,tile,end_d,end_m,end_y,path_obs, path_date,w_dir_wt, w_dir_
     #num_val=num_val_30
     num_val=non_nan
     num_val=np.reshape(num_val,(non_nan.shape[0],1))
-    init_ntl=num_val
+    '''init_ntl=num_val
     print('num_val shape:', num_val.shape)
     ra_ntls=get_ra(num_val,num_val.shape[0])
     num_val=ra_ntls
-    num_val=np.reshape(num_val,(non_nan.shape[0],1))
+    num_val=np.reshape(num_val,(non_nan.shape[0],1))'''
     '''plt.figure()
     plt.subplot(2,1,1)
     plt.title('after call')
@@ -234,21 +251,23 @@ def train_forecast(n,tile,end_d,end_m,end_y,path_obs, path_date,w_dir_wt, w_dir_
     multi_pred_l=30
     
     X_m,y_m=split_multi_step(norm_ts_mm,win_l,multi_pred_l,start_idx,len(norm_ts_mm)) # 1800 corresponds to 2017-01-01 - UPDATE TO INDEX
-    print(norm_ts_mm.shape)
+    print('norm time series dimm',norm_ts_mm.shape)
     
     
     X_m=X_m.reshape((X_m.shape[0],X_m.shape[1],1))
     y_m=y_m.reshape((y_m.shape[0],y_m.shape[1]))
     
+    print('x-m, y-m',X_m.shape,y_m.shape)
+    
     #CREATING TRAINING AND VALIDATION SPLIT FOR EACH CITY
     X_m_tr=X_m[0:(end_idx-start_idx+1),:,:] # 1005: ~3yrs of training, with a 90 day window; UPDATE TO INDEX, CHECK LENGTH (1005 vs 1095)
     y_m_tr=y_m[0:(end_idx-start_idx+1),:]
-    split_idx=random.sample(range(X_m_tr.shape[0]), X_m_tr.shape[0])
+    split_idx=random.sample(range(X_m_tr.shape[0]), X_m_tr.shape[0])#reshuffling windows, indices
     tr_frac=0.8
     val_frac=1-tr_frac
     
-    train_idx=split_idx[0:int(np.floor(tr_frac*X_m_tr.shape[0]))]
-    val_idx=split_idx[int(np.floor(tr_frac*X_m_tr.shape[0])):len(split_idx)]
+    train_idx=split_idx[0:int(np.floor(tr_frac*X_m_tr.shape[0]))]#taking the first randomly shuffled 80% indices
+    val_idx=split_idx[int(np.floor(tr_frac*X_m_tr.shape[0])):len(split_idx)]##taking the next randomly shuffled 20% indices
     
     train_inp=np.zeros((len(train_idx), X_m_tr.shape[1], X_m_tr.shape[2]))
     train_op=np.zeros((len(train_idx), y_m_tr.shape[1]))
@@ -267,15 +286,15 @@ def train_forecast(n,tile,end_d,end_m,end_y,path_obs, path_date,w_dir_wt, w_dir_
         
     #CALL FORECAST METHDOS
     print('calling CNN')
-    fc_cnn(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,UA,tile, w_dir_wt, w_dir_fc,w_dir_comp)
+    fc_cnn(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,sample_pix_v, sample_pix_h,tile, w_dir_wt, w_dir_fc,w_dir_comp)
     print('returned from CNN prediction')
     print('calling ANN')
-    fc_ann(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,UA,tile, w_dir_wt, w_dir_fc,w_dir_comp)
+    fc_ann(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,sample_pix_v, sample_pix_h,tile, w_dir_wt, w_dir_fc,w_dir_comp)
     print('returned from ANN prediction')
     print('calling LSTM')
-    fc_lstm_tf(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,UA,tile, w_dir_wt, w_dir_fc,w_dir_comp)
+    fc_lstm_tf(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,sample_pix_v, sample_pix_h,tile, w_dir_wt, w_dir_fc,w_dir_comp)
     print('returned from LSTM prediction')
-    print('predictions completed on', UA)
+    print('predictions completed on')
     
     
     
@@ -298,7 +317,7 @@ def file_reader(dir_path):
 
 
 #def forecast_city_list(poly_id, tile,end_d,end_m,end_y,path_obs, path_date,w_dir_wt, w_dir_fc,w_dir_comp, eval_dates):
-def forecast_city_list(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y, zarr_path_obs, ts, w_dir_wt, w_dir_fc,w_dir_comp):
+def forecast_city_list(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y,end_date_idx,zarr_date, ts, w_dir_wt, w_dir_fc,w_dir_comp):
     #gets city names in the directory
     #r_dir_path=v['read_dir']
     #w_dir_path=v['write_dir']
@@ -306,20 +325,21 @@ def forecast_city_list(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y, zarr
     #path_dates=os.path.join(r_dir_path,'date')
     #print('--------path------',path)
     #names=file_reader(path)
-    print('calling forecast methods on:', poly_id)
+    print('calling forecast methods on:', sample_pix_v, sample_pix_h, tile)
     #print('FILES/ UA:', names)
     #training_len=pd.read_csv('Training_dates.csv')
     #calls forecast methods
     #for n in names:
     #print('names:',n)
     s=time()
-    train_forecast(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y, zarr_path_obs, ts, w_dir_wt, w_dir_fc,w_dir_comp)
+    train_forecast(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y, end_date_idx,zarr_date, ts, w_dir_wt, w_dir_fc,w_dir_comp)
     print('TOOK:', time()-s)
     print('done training/ predicting')
     print('--------------------------')
     print('computing metrics')
     #for n in names:
     #compute_metrics(poly_id, tile,end_d,end_m,end_y, path_obs,path_date, eval_dates)
+    compute_metrics(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y, end_date_idx,zarr_date, ts, w_dir_wt, w_dir_fc,w_dir_comp)
     
     
 '''if __name__ == '__main__':

@@ -49,7 +49,7 @@ def split_multi_step(num_val,win_l,pred_l, start_p, end_p):#multi LSTM, multi CN
     
     return np.asarray(X), np.asarray(y)
 
-def fc_cnn(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,UA,tile,w_dir_wt, w_dir_fc,w_dir_comp):
+def fc_cnn(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,sample_pix_v, sample_pix_h,tile,w_dir_wt, w_dir_fc,w_dir_comp):
     win_l=60
     pred_l=1
     multi_pred_l=30
@@ -123,7 +123,7 @@ def fc_cnn(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,U
     
     #/app/temp_data/fua",f"city_wts2019_multiCNN_{poly_id}_{tile_name}_default_lr.h5
     #multiStepCNN.save_weights(os.path.join(write_dir_wts,'wts_multiCNN_'+UA+'default_lr.h5'))
-    multiStepCNN.save_weights(str(Path("/app/temp_data",f"wts_multiCNN_{UA}_{tile}_default_lr_v2.h5")))
+    multiStepCNN.save_weights(str(Path("/app/temp_data",f"wts_multiCNN_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.h5")))
     '''rclone.with_config(cfg).run_cmd(command="copy", 
                                             extra_args=[str(Path("/app/temp_data",
                                                                  f"wts_multiCNN_{UA}_{tile}_default_lr.h5")),
@@ -137,7 +137,7 @@ def fc_cnn(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,U
     #os.path.join(write_dir_res,'multiCNN_pred_'+UA+'default_lr.npy'), 'wb'
 
     y_hat=multiStepCNN.predict(X_m)
-    with open(str(Path("/app/temp_data",f"multiCNN_pred_{UA}_{tile}_default_lr_v2.npy")), 'wb') as f:
+    with open(str(Path("/app/temp_data",f"multiCNN_pred_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.npy")), 'wb') as f:
         np.save(f, y_hat)
     
     '''rclone.with_config(cfg).run_cmd(command="copy", 
@@ -180,7 +180,7 @@ def fc_cnn(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,U
     plt.savefig(os.path.join(write_dir_plots,'plot_'+UA+'-multiCNN.png'), dpi = 180) 
     plt.close()'''
     
-def fc_ann(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,UA,tile,w_dir_wt, w_dir_fc,w_dir_comp):
+def fc_ann(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,sample_pix_v, sample_pix_h,tile,w_dir_wt, w_dir_fc,w_dir_comp):
     win_l=60
     pred_l=1
     multi_pred_l=30
@@ -241,7 +241,7 @@ def fc_ann(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,U
 
     #multiStepANN.save_weights(os.path.join(write_dir_wts,'wts_multiANN_'+UA+'default_lr.h5'))
     
-    multiStepANN.save_weights(str(Path("/app/temp_data",f"wts_multiANN_{UA}_{tile}_default_lr_v2.h5")))
+    multiStepANN.save_weights(str(Path("/app/temp_data",f"wts_multiANN_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.h5")))
     '''rclone.with_config(cfg).run_cmd(command="copy", 
                                             extra_args=[str(Path("/app/temp_data",
                                                                  f"wts_multiANN_{UA}_{tile}_default_lr.h5")),
@@ -254,7 +254,7 @@ def fc_ann(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,U
         ('forecast dir exists, writing to it')'''
         
     y_hat=multiStepANN.predict(X_m)
-    with open(str(Path("/app/temp_data",f"multiANN_pred_{UA}_{tile}_default_lr_v2.npy")), 'wb') as f:
+    with open(str(Path("/app/temp_data",f"multiANN_pred_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.npy")), 'wb') as f:
         np.save(f, y_hat)
     
     '''rclone.with_config(cfg).run_cmd(command="copy", 
@@ -290,7 +290,7 @@ def fc_ann(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,U
     plt.savefig(os.path.join(write_dir_plot,'plot_'+UA+'-multiANN.png'), dpi = 180) 
     plt.close()'''
     
-def fc_lstm_tf(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,UA,tile,w_dir_wt, w_dir_fc,w_dir_comp):
+def fc_lstm_tf(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_tr,sample_pix_v, sample_pix_h,tile,w_dir_wt, w_dir_fc,w_dir_comp):
     win_l=60
     pred_l=1
     multi_pred_l=30
@@ -337,7 +337,7 @@ def fc_lstm_tf(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_
     #multiStepANN.save_weights(str(Path("/app/temp_data",f"wts_multiANN_{UA}_{tile}_default_lr.h5")))
             
     #multi_LSTM.save_weights(os.path.join(write_dir_wts,'wts_multiLSTM_'+UA+'default_lr_with_relu.h5'))
-    multi_LSTM.save_weights(str(Path("/app/temp_data",f"wts_multiLSTM_{UA}_{tile}_default_lr_with_relu_v2.h5")))
+    multi_LSTM.save_weights(str(Path("/app/temp_data",f"wts_multiLSTM_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_with_relu_v2.h5")))
     
     '''rclone.with_config(cfg).run_cmd(command="copy", 
                                             extra_args=[str(Path("/app/temp_data",
@@ -352,7 +352,7 @@ def fc_lstm_tf(norm_ts_mm,X_m,y_m,train_inp,train_op,val_inp, val_op,X_m_tr,y_m_
             
     y_hat=multi_LSTM.predict(X_m)
     #with open(os.path.join(write_dir_res,'multiLSTM_pred_'+UA+'default_lr_with_relu.npy'), 'wb') as f:
-    with open(str(Path("/app/temp_data",f"multiLSTM_pred_{UA}_{tile}_default_lr_with_relu_v2.npy")), 'wb') as f:
+    with open(str(Path("/app/temp_data",f"multiLSTM_pred_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_with_relu_v2.npy")), 'wb') as f:
         np.save(f, y_hat)
         
     '''with open(str(Path("/app/temp_data/fua",f"multiANN_pred_{poly_id}_{tile_name}_default_lr.npy")), 'wb') as f:

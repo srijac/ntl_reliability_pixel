@@ -388,32 +388,32 @@ def ch_summary_methods(bin_ann_avg,bin_cnn_avg, bin_lstm_avg,bin_ens_avg, avg_pr
             
     return ch_summary
 
-def compute_metrics(n, tile,end_d,end_m,end_y, path_obs,path_date, eval_dates):    
+def compute_metrics(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y, end_date_idx,zarr_date, ts, w_dir_wt, w_dir_fc,w_dir_comp):    
     #names=file_reader(r_dir_path)
     #print('FILES:', names)
     
     #df = pd.read_csv(os.path.join(r_dir_path,n),sep='\s+',header=None)
     s=time()
-    UA=n
+    #UA=n
     #tile=(n.split('_'))[2]
-    print('CURRENT UA, tile:', UA, tile)
-    print('path3:',path_obs)
+    #print('CURRENT UA, tile:', UA, tile)
+    #print('path3:',path_obs)
     
-    df=np.load(path_obs)
+    #df=np.load(path_obs)
+    df=ts
     
-    
-    date=np.load(path_date)
+    #date=np.load(path_date)
     end_day=end_d
     end_month=end_m
     end_year=end_y
     
     print('END YEAR:', end_year)
     #num_val_ntl=df[:,0]
-    num_val_gf=df[:,3]
-    gf_flag=df[:,4]
+    num_val_gf=df
+    #gf_flag=df[:,4]
     
     
-    yr=[]
+    '''yr=[]
     month=[]
     day=[]
     for dd in np.arange(0, len(date)):
@@ -423,37 +423,37 @@ def compute_metrics(n, tile,end_d,end_m,end_y, path_obs,path_date, eval_dates):
     
     yr=np.asarray(yr)
     month=np.asarray(month)
-    day=np.asarray(day)
+    day=np.asarray(day)'''
     
     non_nan=[]
-    non_nan_yr=[]
-    non_nan_month=[]
-    non_nan_day=[]
-    non_nan_flag=[]
+    #non_nan_yr=[]
+    #non_nan_month=[]
+    #non_nan_day=[]
+    #non_nan_flag=[]
     #print(len(num_val_30))
-    print('year',yr)
+    #print('year',yr)
     num_val_30=num_val_gf
     print('num_val_30',num_val_gf[0] )
     for i in np.arange(0,len(num_val_30)):
         if (~np.isnan(num_val_30[i])):
             non_nan.append(num_val_30[i])
-            non_nan_yr.append(yr[i])
-            non_nan_month.append(month[i])
-            non_nan_day.append(day[i])
-            non_nan_flag.append(gf_flag[i])
+            #non_nan_yr.append(yr[i])
+            #non_nan_month.append(month[i])
+            #non_nan_day.append(day[i])
+            #non_nan_flag.append(gf_flag[i])
             
     non_nan=np.asarray(non_nan)
-    non_nan_yr=np.asarray(non_nan_yr)
+    '''non_nan_yr=np.asarray(non_nan_yr)
     non_nan_month=np.asarray(non_nan_month)
     non_nan_day=np.asarray(non_nan_day)
     non_nan_flag=np.asarray(non_nan_flag)
     non_nan_d_list=non_nan_day
     non_nan_m_list=non_nan_month
-    non_nan_y_list=non_nan_yr
+    non_nan_y_list=non_nan_yr'''
     
     #print(yr)
     
-    start=np.asarray(np.where(non_nan_yr==2012))#changed from yr to non-nan-yr
+    '''start=np.asarray(np.where(non_nan_yr==2012))#changed from yr to non-nan-yr
     
     #print('start array:', start)
     #print('start',start[0,0])
@@ -466,24 +466,30 @@ def compute_metrics(n, tile,end_d,end_m,end_y, path_obs,path_date, eval_dates):
     #print('start, end', start, end)
     
     start_idx=start[0,0]
-    end_idx=end[0,-1]
-    print('UA, end year, end', UA, end_year, end_idx, non_nan[end_idx])
+    end_idx=end[0,-1]'''
+    start_idx=0
+    #end_idx=end_date_idx
+    end_idx=1200
+    
+    print('time-series around 1200:', non_nan[1180:1220])
+    print('TIME SERIES L:', non_nan.shape)
+    print('UA, end year, end', end_idx, non_nan[end_idx])
     
     d_full=[]
     win_l=60
-    print('list len:', len(non_nan_d_list))
+    '''print('list len:', len(non_nan_d_list))
     for i in np.arange(start_idx+win_l,len(non_nan_d_list)):
         #print(i,non_nan_d_list[i], non_nan_m_list[i], non_nan_y_list[i])
         #print(i,str(non_nan_d_list[i])+'-'+str(non_nan_m_list[i])+'-'+str(non_nan_y_list[i]))
-        d_full.append(str(non_nan_y_list[i])+'-'+str(non_nan_m_list[i])+'-'+str(non_nan_d_list[i]))
+        d_full.append(str(non_nan_y_list[i])+'-'+str(non_nan_m_list[i])+'-'+str(non_nan_d_list[i]))'''
     
     num_val=non_nan
     num_val=np.reshape(num_val,(non_nan.shape[0],1))
-    init_ntl=num_val
+    '''init_ntl=num_val
     print('num_val shape:', num_val.shape)
     ra_ntls=get_ra(num_val,num_val.shape[0])
     num_val=ra_ntls
-    num_val=np.reshape(num_val,(non_nan.shape[0],1))
+    num_val=np.reshape(num_val,(non_nan.shape[0],1))'''
     
     
     '''plt.figure()
@@ -502,12 +508,12 @@ def compute_metrics(n, tile,end_d,end_m,end_y, path_obs,path_date, eval_dates):
     
     
     #years_tick=['2012','2013','2014','2015','2016','2017','2018','2019','2020','2021']
-    years_tick=[2012,2013,2014,2015,2016,2017,2018,2019,2020,2021, 2022]
+    '''years_tick=[2012,2013,2014,2015,2016,2017,2018,2019,2020,2021, 2022]
     years_tick_pos=[]
     for idx,y in enumerate(years_tick):
         print('index, yr:',idx,y)
         years_tick_pos.append(((np.asarray(np.where(non_nan_yr==y)))[0,0]-start_idx))
-    years_tick_pos=np.asarray(years_tick_pos)
+    years_tick_pos=np.asarray(years_tick_pos)'''
     
     
     #mm_obj,norm_ts_mm=min_max_norm(num_val,start_idx,end_idx)# returns the entirely normalized ts, based on parameters upto 305
@@ -524,9 +530,9 @@ def compute_metrics(n, tile,end_d,end_m,end_y, path_obs,path_date, eval_dates):
     pred_m_ann=np.load(os.path.join(os.getcwd(),w_dir_path,'forecasts','multiANN_pred_'+UA+'default_lr.npy'))
     pred_m_lstm=np.load(os.path.join(os.getcwd(),w_dir_path,'forecasts','multiLSTM_pred_'+UA+'default_lr_with_relu.npy'))'''
     
-    pred_m_cnn=np.load(str(Path("/app/temp_data",f"multiCNN_pred_{UA}_{tile}_default_lr_v2.npy")))
-    pred_m_ann=np.load(str(Path("/app/temp_data",f"multiANN_pred_{UA}_{tile}_default_lr_v2.npy")))
-    pred_m_lstm=np.load(str(Path("/app/temp_data",f"multiLSTM_pred_{UA}_{tile}_default_lr_with_relu_v2.npy")))
+    pred_m_cnn=np.load(str(Path("/app/temp_data",f"multiCNN_pred_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.npy")))
+    pred_m_ann=np.load(str(Path("/app/temp_data",f"multiANN_pred_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.npy")))
+    pred_m_lstm=np.load(str(Path("/app/temp_data",f"multiLSTM_pred_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_with_relu_v2.npy")))
     
 
     #get median predictions from all windows a time-step appears in
@@ -561,7 +567,7 @@ def compute_metrics(n, tile,end_d,end_m,end_y, path_obs,path_date, eval_dates):
     
     print('shapes:', norm_ts_mm[win_l+start_idx:,0].shape, avg_pred_ann.shape, avg_mse_ann.shape)
     
-    observation_count=avg_mse_lstm.shape[0]
+    '''observation_count=avg_mse_lstm.shape[0]
     ts_stack=np.zeros((observation_count,14))#ntl,ntl-filtered,non_weighted_avg, wt_ntl_filtered, gap-filled, gap-filled-filtered,non_weighted_gap_ wt-gap-filled, flags
     #ts_stack[:,0]=ntl[]
     #ts_stack[:,1]=filterd_ntl
@@ -578,17 +584,17 @@ def compute_metrics(n, tile,end_d,end_m,end_y, path_obs,path_date, eval_dates):
     ts_stack[:,10]=avg_mse_lstm
     ts_stack[:,11]=avg_mse_ens
     ts_stack[:,12]=c_flag[:,0]
-    ts_stack[:,13]=non_nan_flag[start_idx+win_l:]
+    ts_stack[:,13]=non_nan_flag[start_idx+win_l:]'''
     #ts_stack[:,6]=np.datetime64(poly_zarr["Dates"][0:])
     
-    np.savetxt(str(Path("/app/temp_data",f"fua_{UA}_{tile}_pred_mse.csv")),ts_stack,fmt='%f', delimiter=',', newline='\n',header='yr, month, day, ntl_avg, pred_ann, pred_cnn, pred_lstm, pred_ens, mse_ann, mse_cnn, mse_lstm, mse_ens, ens_flag, qa_flag')
+    #np.savetxt(str(Path("/app/temp_data",f"fua_{UA}_{tile}_pred_mse.csv")),ts_stack,fmt='%f', delimiter=',', newline='\n',header='yr, month, day, ntl_avg, pred_ann, pred_cnn, pred_lstm, pred_ens, mse_ann, mse_cnn, mse_lstm, mse_ens, ens_flag, qa_flag')
     
     
-    pred_plots(avg_pred_ann, avg_pred_cnn, avg_pred_ens, avg_pred_lstm,norm_ts_mm, win_l,start_idx,years_tick, years_tick_pos, UA,tile, avg_mse_ens)
+    pred_plots_pix(avg_pred_ann, avg_pred_cnn, avg_pred_ens, avg_pred_lstm,norm_ts_mm, win_l,start_idx, sample_pix_v, sample_pix_h, tile, avg_mse_ens)
     
     
     #----------------top k mse from each method extracting threshold values------
-    mse_top_ann_avg=np.sort(avg_mse_ann)[::-1]
+    '''mse_top_ann_avg=np.sort(avg_mse_ann)[::-1]
     mse_top_cnn_avg=np.sort(avg_mse_cnn)[::-1]
     mse_top_ens_avg=np.sort(avg_mse_ens)[::-1]
     mse_top_lstm_avg=np.sort(avg_mse_lstm)[::-1]
@@ -736,5 +742,5 @@ def compute_metrics(n, tile,end_d,end_m,end_y, path_obs,path_date, eval_dates):
     
     np.savetxt(str(Path("/app/temp_data",f"fua_{UA}_{tile}_eval.csv")),eval_stack,fmt='%f', delimiter=',', newline='\n',header='rec-ann, prec-ann,del-ann,rec-cnn, prec-cnn,del-cnn, rec-ens, prec-ens,del-ens, rec-lstm, prec-lstm,del-lstm ')
     
-    print('TOOK:', time()-s)
+    print('TOOK:', time()-s)'''
     

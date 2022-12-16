@@ -114,6 +114,7 @@ def main():
     l_col=tile_patch[t][0][city][3]
     
     end_date=tile_patch[t][0]['end_change_date']
+    change_date=tile_patch[t][0]['change_date']
     
     print('r c bounds:', u_row, u_col, l_row, l_col)
     u_row_ad=math.floor(u_row/2)
@@ -144,6 +145,15 @@ def main():
     # Make s3 "directories" for the output data
     '''for new_dir in ["ceph:fua_subset_numpy"]:#Fua_run2 is the main dir? with fua as subdir?
         create_s3_dir(cfg, new_dir)'''
+    w_dir_wt="ceph:zarrs/wsf/wsf_1km/pixel_rel/weights"
+    w_dir_fc="ceph:zarrs/wsf/wsf_1km/pixel_rel/forecast"
+    w_dir_comp="ceph:zarrs/wsf/wsf_1km/pixel_rel/composite"
+    w_dir_plots="ceph:zarrs/wsf/wsf_1km/pixel_rel/plots"
+    
+    for new_dir in [w_dir_wt, w_dir_fc,w_dir_comp, w_dir_plots ]:
+        create_s3_dir(cfg, new_dir)
+        
+    
     '''w_dir="ceph:anomaly_write_global"
     w_dir_wt="ceph:anomaly_write_global/weights"
     w_dir_fc="ceph:anomaly_write_global/forecast"
@@ -271,7 +281,8 @@ def main():
         zarr_date = np.array(poly_zarr['Dates'])
         print('coord start end:',np.min(sample_h), np.max(sample_h), np.min(sample_v), np.max(sample_v))
         print('looking for:', sample_pix_h_ad, sample_pix_v_ad)
-    
+        
+        x_marker=3296
         for idx,coord in enumerate(zip(sample_h,sample_v)):
             #print('coord', coord, coord[0], coord[1], coord[0]+1)
             #print('list:',idx, coord)
@@ -280,6 +291,7 @@ def main():
                 plt.figure(figsize=(21,11))
                 plt.plot(gf_ntl[:,idx])
                 #plt.savefig(str(Path("/app/temp_data",f"fua_{UA}_{tile}_ch_dir_pred_conf.png")), dpi=180)/wsf_1km/pixel_rel/change_{tile}_{city}.zarr
+                plt.axvline(x_marker, linestyle='--', color='b', linewidth=1.5)
                 plt.savefig(str(Path(f"/app/temp_data",f"chplot_{tile}_{city}_{sample_pix_v}_{sample_pix_h}.png")), dpi=180)
                 plt.close()
     
@@ -289,6 +301,7 @@ def main():
                 ts=gf_ntl[:,idx]
                 
     end_date_search=np.array(np.datetime64(end_date))
+    print('TS LENFTH BEFORE CALL', ts.shape)
     print('date:',zarr_date[0], zarr_date[3], zarr_date[-1], np.datetime64(zarr_date[0]).astype(object).year,np.datetime64(zarr_date[0]).astype(object).month, np.datetime64(zarr_date[0]).astype(object).day )
     for idx,x in enumerate(zarr_date):
         x_m=np.array(np.datetime64(x))
@@ -296,16 +309,62 @@ def main():
             print('end date:', idx, x, zarr_date[idx])
             end_date_idx=idx
             break
+            
       
         
     end_d=np.datetime64(zarr_date[idx]).astype(object).day
     end_y=np.datetime64(zarr_date[idx]).astype(object).year
     end_m=np.datetime64(zarr_date[idx]).astype(object).month
     
-    forecast_city_list(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y, zarr_path_obs, ts, w_dir_wt, w_dir_fc,w_dir_comp)
+    
+    change_date_search=np.array(np.datetime64(change_date))
+    for idx,x in enumerate(zarr_date):
+        x_m=np.array(np.datetime64(x))
+        if change_date_search==x_m:
+            print('change date:', idx, x, zarr_date[idx])
+            change_date_idx=idx
+            break
+            
+    print('change date', change_date_idx, zarr_date[change_date_idx])
+    
+    print('dates:',zarr_date[idx],np.datetime64(zarr_date[0]).astype(object).year,np.datetime64(zarr_date[0]).astype(object).month, np.datetime64(zarr_date[0]).astype(object).day )
+    
+    forecast_city_list(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y,end_date_idx,zarr_date, ts, w_dir_wt, w_dir_fc,w_dir_comp)
     print('done plot')
     os.remove(str(Path(f"/app/temp_data", f"chplot_{tile}_{city}_{sample_pix_v}_{sample_pix_h}.png")))
     rmtree(str(Path(f"/app/temp_data/change_{tile}_{city}.zarr")))
+    
+    rclone.with_config(cfg).run_cmd(command="copy", 
+                                            extra_args=[str(Path(f"/app/temp_data",f"wts_multiCNN_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.h5")),
+                                                        f"{w_dir_wt}/wts_multiCNN_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.h5"])
+                                                        
+    rclone.with_config(cfg).run_cmd(command="copy", 
+                                            extra_args=[str(Path(f"/app/temp_data",f"multiCNN_pred_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.npy")),
+                                                        f"{w_dir_comp}/multiCNN_pred_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.npy"])
+                                                        
+    rclone.with_config(cfg).run_cmd(command="copy", 
+                                            extra_args=[str(Path(f"/app/temp_data",f"wts_multiANN_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.h5")),
+                                                        f"{w_dir_wt}/wts_multiANN_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.h5"])
+                                                        
+    rclone.with_config(cfg).run_cmd(command="copy", 
+                                            extra_args=[str(Path(f"/app/temp_data",f"multiANN_pred_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.npy")),
+                                                        f"{w_dir_comp}/multiANN_pred_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_v2.npy"])
+                                                        
+    rclone.with_config(cfg).run_cmd(command="copy", 
+                                            extra_args=[str(Path(f"/app/temp_data",f"wts_multiLSTM_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_with_relu_v2.h5")),
+                                                        f"{w_dir_wt}/wts_multiLSTM_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_with_relu_v2.h5"])
+                                                        
+    rclone.with_config(cfg).run_cmd(command="copy", 
+                                            extra_args=[str(Path(f"/app/temp_data",f"multiLSTM_pred_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_with_relu_v2.npy")),
+                                                        f"{w_dir_comp}/multiLSTM_pred_{sample_pix_v}_{sample_pix_h}_{tile}_default_lr_with_relu_v2.npy"])
+                                                        
+                                                        
+    
+    
+    rclone.with_config(cfg).run_cmd(command="copy", 
+                                            extra_args=[str(Path(f"/app/temp_data",f"pred_{sample_pix_v}_{sample_pix_h}_{tile}_err.png")),
+                                                        f"{w_dir_plots}/pred_{sample_pix_v}_{sample_pix_h}_{tile}_err.png"])
+                                                            
             
     '''os.remove(str(Path(f"/wsf_1km", f"chplot_{tile}_{city}.png")))
     rmtree(str(Path(f"/wsf_1km/change_{tile}_{city}.zarr")))'''

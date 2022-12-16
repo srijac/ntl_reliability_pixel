@@ -4,7 +4,8 @@
       "Houston": [0, 963,139,1224],
 	  "Houston_sub1": [12,1020,50,1046],
 	  "Houston_sub2": [56, 988, 76, 1025],
-	  "end_change_date": "2018-12-31"
+	  "end_change_date": "2018-12-31",
+	  "change_date": "2021-02-15"
     }
   ]
 }
