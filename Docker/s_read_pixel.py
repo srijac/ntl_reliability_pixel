@@ -239,7 +239,7 @@ def main():
                     
                     
                     if ((coord[0]==sample_pix_h_ad)&(coord[1]==sample_pix_v_ad)):
-                        print('-------------sample match at:-------------',idx, coord[0],coord[1], final_gapfilled_ntl[3296, idx],final_gapfilled_ntl[3297, idx])
+                        print('-------------sample match at:-------------',idx, coord[0],coord[1],sample_h[idx], sample_v[idx], final_gapfilled_ntl[3296, idx],final_gapfilled_ntl[3297, idx])
             
             pix_r=np.transpose(np.asarray(pix_r))
             pix_c=np.transpose(np.asarray(pix_c))
@@ -294,13 +294,13 @@ def main():
         print('looking for:', sample_pix_h_ad, sample_pix_v_ad)
         
         x_marker=3296
-        for idx,coord in enumerate(zip(sample_h,sample_v)):
+        for idx_p,coord in enumerate(zip(sample_h,sample_v)):
             #print('coord', coord, coord[0], coord[1], coord[0]+1)
             #print('list:',idx, coord)
             if ((coord[0]==sample_pix_h_ad)&(coord[1]==sample_pix_v_ad)):
-                print('found from roi zarr:', idx, coord)
+                print('found from roi zarr:', idx_p, coord, gf_ntl[3296,idx_p],gf_ntl[3297,idx_p])
                 plt.figure(figsize=(21,11))
-                plt.plot(gf_ntl[:,idx])
+                plt.plot(gf_ntl[:,idx_p])
                 #plt.savefig(str(Path("/app/temp_data",f"fua_{UA}_{tile}_ch_dir_pred_conf.png")), dpi=180)/wsf_1km/pixel_rel/change_{tile}_{city}.zarr
                 plt.axvline(x_marker, linestyle='--', color='b', linewidth=1.5)
                 plt.savefig(str(Path(f"/app/temp_data",f"chplot_{tile}_{city}_{sample_pix_v}_{sample_pix_h}.png")), dpi=180)
@@ -309,8 +309,9 @@ def main():
                 rclone.with_config(cfg).run_cmd(command="copy", 
                                             extra_args=[str(Path(f"/app/temp_data",f"chplot_{tile}_{city}_{sample_pix_v}_{sample_pix_h}.png")),
                                                         f"ceph:zarrs/wsf/wsf_1km/pixel_rel/chplot_{tile}_{city}_{sample_pix_v}_{sample_pix_h}.png"])    
-                ts=gf_ntl[:,idx]
-    print('idx of selecte pixel:', idx, sample_h[idx], sample_v[idx], gf_ntl[3296,idx],gf_ntl[3297,idx])
+                ts=gf_ntl[:,idx_p]
+                print('idx_p is:', idx_p,sample_h[idx_p], sample_v[idx_p])
+    print('idx of selecte pixel:', idx_p, sample_h[idx_p], sample_v[idx_p], gf_ntl[3296,idx_p],gf_ntl[3297,idx_p])
     print('ntl at feb 15:',ts[3276:3316], ts[3296], ts[3297])
     end_date_search=np.array(np.datetime64(end_date))
     print('TS LENFTH BEFORE CALL', ts.shape)
