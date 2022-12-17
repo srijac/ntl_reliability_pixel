@@ -193,14 +193,25 @@ def main():
 
             # Get the Gap-Filled Night Time Lights
             final_gapfilled_ntl = np.array(poly_zarr["Gap_Filled_DNB_BRDF-Corrected_NTL"])
+            print('29, 1035 adjusted on feb 15',final_gapfilled_ntl[3295, 7316], final_gapfilled_ntl[3296, 7316])
             print('looking at:', tile)
             print(poly_zarr.tree())
             print('time-series length:', final_gapfilled_ntl.shape[0])
-            print('-------------------------------')
+            
             sample_h = np.array(poly_zarr['Pixel_H'])
             sample_v = np.array(poly_zarr['Pixel_V'])
             zarr_date=np.array(poly_zarr['Dates'])
-            print('date:',zarr_date[0], zarr_date[3], zarr_date[-1])
+            
+            
+            print('-------------------------------')
+            
+            for idx,coord in enumerate(zip(sample_h,sample_v)):
+                #print('coord', coord, coord[0], coord[1], coord[0]+1)
+                #print('list:',idx, coord)
+                if ((coord[0]==sample_pix_h_ad)&(coord[1]==sample_pix_v_ad)):
+                    print('found index:', idx, coord, final_gapfilled_ntl[3295,idx],final_gapfilled_ntl[3296,idx],final_gapfilled_ntl[3297,idx])
+                    
+            print('date:',zarr_date[0], zarr_date[3], zarr_date[-1], zarr_date[3295], zarr_date[3296],zarr_date[3297])
             #print(zarr_date.dtype, sample_h.dtype)
             gf_ntl=[]
             pix_r=[]
@@ -228,7 +239,7 @@ def main():
                     
                     
                     if ((coord[0]==sample_pix_h_ad)&(coord[1]==sample_pix_v_ad)):
-                        print('-------------sample match at:-------------',idx, coord[0],coord[1])
+                        print('-------------sample match at:-------------',idx, coord[0],coord[1], final_gapfilled_ntl[3296, idx],final_gapfilled_ntl[3297, idx])
             
             pix_r=np.transpose(np.asarray(pix_r))
             pix_c=np.transpose(np.asarray(pix_c))
@@ -287,7 +298,7 @@ def main():
             #print('coord', coord, coord[0], coord[1], coord[0]+1)
             #print('list:',idx, coord)
             if ((coord[0]==sample_pix_h_ad)&(coord[1]==sample_pix_v_ad)):
-                print('found:', idx, coord)
+                print('found from roi zarr:', idx, coord)
                 plt.figure(figsize=(21,11))
                 plt.plot(gf_ntl[:,idx])
                 #plt.savefig(str(Path("/app/temp_data",f"fua_{UA}_{tile}_ch_dir_pred_conf.png")), dpi=180)/wsf_1km/pixel_rel/change_{tile}_{city}.zarr
@@ -299,7 +310,8 @@ def main():
                                             extra_args=[str(Path(f"/app/temp_data",f"chplot_{tile}_{city}_{sample_pix_v}_{sample_pix_h}.png")),
                                                         f"ceph:zarrs/wsf/wsf_1km/pixel_rel/chplot_{tile}_{city}_{sample_pix_v}_{sample_pix_h}.png"])    
                 ts=gf_ntl[:,idx]
-                
+    print('idx of selecte pixel:', idx, sample_h[idx], sample_v[idx], gf_ntl[3296,idx],gf_ntl[3297,idx])
+    print('ntl at feb 15:',ts[3276:3316], ts[3296], ts[3297])
     end_date_search=np.array(np.datetime64(end_date))
     print('TS LENFTH BEFORE CALL', ts.shape)
     print('date:',zarr_date[0], zarr_date[3], zarr_date[-1], np.datetime64(zarr_date[0]).astype(object).year,np.datetime64(zarr_date[0]).astype(object).month, np.datetime64(zarr_date[0]).astype(object).day )
