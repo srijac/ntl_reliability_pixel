@@ -225,6 +225,7 @@ def main():
                     
     
     print('looking for pixel idx, coord, date, val', idx_p, sample_h[idx_p],sample_v[idx_p], zarr_date[change_date_idx], final_gapfilled_ntl[change_date_idx,idx_p])
+    print('looking for pixel idx, coord, on 16th feb, val', idx_p, sample_h[idx_p],sample_v[idx_p], zarr_date[change_date_idx+1], final_gapfilled_ntl[change_date_idx+1,idx_p])
                     
             
 if __name__ == "__main__":
