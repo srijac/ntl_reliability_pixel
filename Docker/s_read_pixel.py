@@ -167,6 +167,10 @@ def main():
     
     sample_pix_h=1035
     sample_pix_v=29
+    '''sample_pix_h=349
+    sample_pix_v=148'''
+    '''sample_pix_h=1151
+    sample_pix_v=68'''
     sample_pix_h_ad=math.floor(sample_pix_h/2)
     sample_pix_v_ad=math.floor(sample_pix_v/2)
     with warnings.catch_warnings():
@@ -193,7 +197,7 @@ def main():
 
             # Get the Gap-Filled Night Time Lights
             final_gapfilled_ntl = np.array(poly_zarr["Gap_Filled_DNB_BRDF-Corrected_NTL"])
-            print('29, 1035 adjusted on feb 15',final_gapfilled_ntl[3295, 7316], final_gapfilled_ntl[3296, 7316])
+            print('29, 1035 adjusted on feb 15',final_gapfilled_ntl[3295, 7316], final_gapfilled_ntl[3296, 7316], final_gapfilled_ntl[3297, 7316], final_gapfilled_ntl[3298, 7316])
             print('looking at:', tile)
             print(poly_zarr.tree())
             print('time-series length:', final_gapfilled_ntl.shape[0])
@@ -209,9 +213,29 @@ def main():
                 #print('coord', coord, coord[0], coord[1], coord[0]+1)
                 #print('list:',idx, coord)
                 if ((coord[0]==sample_pix_h_ad)&(coord[1]==sample_pix_v_ad)):
-                    print('found index:', idx, coord, final_gapfilled_ntl[3295,idx],final_gapfilled_ntl[3296,idx],final_gapfilled_ntl[3297,idx])
+                    print('found index:', idx, coord, final_gapfilled_ntl[3295,idx],final_gapfilled_ntl[3296,idx],final_gapfilled_ntl[3297,idx], final_gapfilled_ntl[3298,idx])
+            
+            max_val=np.nanmax(final_gapfilled_ntl[3297,:])
+            print('-----3295------',final_gapfilled_ntl[3295,:], np.nanmax(final_gapfilled_ntl[3295,:]))
+            print('------3296-----',final_gapfilled_ntl[3296,:], np.nanmax(final_gapfilled_ntl[3296,:]))
+            print('------3297-----',final_gapfilled_ntl[3297,:], np.nanmax(final_gapfilled_ntl[3297,:]))
+            print('------3298-----',final_gapfilled_ntl[3298,:], np.nanmax(final_gapfilled_ntl[3298,:]))
+            print('max val---', max_val)
+            max_loc_16=np.asarray(np.where(final_gapfilled_ntl[3297,:]==max_val))
+            print('-------loc-----', max_val,max_loc_16)
+            print('-------loc-----', max_val,max_loc_16, max_loc_16.shape, max_loc_16[0,0], sample_h.shape,)
+            max_loc=max_loc_16[0,0]
+            print('sample h,v:', sample_h[max_loc], sample_v[max_loc])
+            
+            print('max val 3298---', max_val)
+            max_loc_16=np.asarray(np.where(final_gapfilled_ntl[3298,:]==max_val))
+            print('-------loc-----', max_val,max_loc_16)
+            #print('-------loc-----', max_val,max_loc_16, max_loc_16.shape, max_loc_16[0,0], sample_h.shape,)
+            #max_loc=max_loc_16[0,0]
+            #print('sample h,v:', sample_h[max_loc], sample_v[max_loc])
+            
                     
-            print('date:',zarr_date[0], zarr_date[3], zarr_date[-1], zarr_date[3295], zarr_date[3296],zarr_date[3297])
+            print('date:',zarr_date[0], zarr_date[3], zarr_date[-1], zarr_date[3295], zarr_date[3296],zarr_date[3297],zarr_date[3298])
             #print(zarr_date.dtype, sample_h.dtype)
             gf_ntl=[]
             pix_r=[]
@@ -239,7 +263,7 @@ def main():
                     
                     
                     if ((coord[0]==sample_pix_h_ad)&(coord[1]==sample_pix_v_ad)):
-                        print('-------------sample match at:-------------',idx, coord[0],coord[1],sample_h[idx], sample_v[idx], final_gapfilled_ntl[3296, idx],final_gapfilled_ntl[3297, idx])
+                        print('-------------sample match at:-------------',idx, coord[0],coord[1],sample_h[idx], sample_v[idx], final_gapfilled_ntl[3296, idx],final_gapfilled_ntl[3297, idx],final_gapfilled_ntl[3298, idx])
             
             pix_r=np.transpose(np.asarray(pix_r))
             pix_c=np.transpose(np.asarray(pix_c))
@@ -298,7 +322,7 @@ def main():
             #print('coord', coord, coord[0], coord[1], coord[0]+1)
             #print('list:',idx, coord)
             if ((coord[0]==sample_pix_h_ad)&(coord[1]==sample_pix_v_ad)):
-                print('found from roi zarr:', idx_p, coord, gf_ntl[3296,idx_p],gf_ntl[3297,idx_p])
+                print('found from roi zarr:', idx_p, coord, gf_ntl[3296,idx_p],gf_ntl[3297,idx_p],gf_ntl[3298,idx_p])
                 plt.figure(figsize=(21,11))
                 plt.plot(gf_ntl[:,idx_p])
                 #plt.savefig(str(Path("/app/temp_data",f"fua_{UA}_{tile}_ch_dir_pred_conf.png")), dpi=180)/wsf_1km/pixel_rel/change_{tile}_{city}.zarr
@@ -311,7 +335,7 @@ def main():
                                                         f"ceph:zarrs/wsf/wsf_1km/pixel_rel/chplot_{tile}_{city}_{sample_pix_v}_{sample_pix_h}.png"])    
                 ts=gf_ntl[:,idx_p]
                 print('idx_p is:', idx_p,sample_h[idx_p], sample_v[idx_p])
-    print('idx of selecte pixel:', idx_p, sample_h[idx_p], sample_v[idx_p], gf_ntl[3296,idx_p],gf_ntl[3297,idx_p])
+    print('idx of selecte pixel:', idx_p, sample_h[idx_p], sample_v[idx_p], gf_ntl[3296,idx_p],gf_ntl[3297,idx_p],gf_ntl[3298,idx_p])
     print('ntl at feb 15:',ts[3276:3316], ts[3296], ts[3297])
     end_date_search=np.array(np.datetime64(end_date))
     print('TS LENFTH BEFORE CALL', ts.shape)
@@ -376,7 +400,21 @@ def main():
     
     rclone.with_config(cfg).run_cmd(command="copy", 
                                             extra_args=[str(Path(f"/app/temp_data",f"pred_{sample_pix_v}_{sample_pix_h}_{tile}_err.png")),
-                                                        f"{w_dir_plots}/pred_{sample_pix_v}_{sample_pix_h}_{tile}_err.png"])
+                                                        f"{w_dir_plots}/"])
+                                                        
+    
+    
+    rclone.with_config(cfg).run_cmd(command="copy", 
+                                            extra_args=[str(Path(f"/app/temp_data",f"fua_{sample_pix_v}_{sample_pix_h}_{tile}_ens_pred.png")),
+                                                        f"{w_dir_plots}/"])
+                                                        
+    rclone.with_config(cfg).run_cmd(command="copy", 
+                                            extra_args=[str(Path(f"/app/temp_data",f"fua_{sample_pix_v}_{sample_pix_h}_{tile}_ens_pred_flag.png")),
+                                                        f"{w_dir_plots}/"])
+                                                        
+    rclone.with_config(cfg).run_cmd(command="copy", 
+                                            extra_args=[str(Path(f"/app/temp_data",f"fua_{sample_pix_v}_{sample_pix_h}_{tile}_ens_pred_clipped.png")),
+                                                        f"{w_dir_plots}/"])
                                                             
             
     '''os.remove(str(Path(f"/wsf_1km", f"chplot_{tile}_{city}.png")))

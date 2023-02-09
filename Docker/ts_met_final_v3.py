@@ -434,6 +434,7 @@ def compute_metrics(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y, end_dat
     #print('year',yr)
     num_val_30=num_val_gf
     print('num_val_30',num_val_gf[0] )
+    print('TIME SERIES L before:', num_val_30.shape)
     for i in np.arange(0,len(num_val_30)):
         if (~np.isnan(num_val_30[i])):
             non_nan.append(num_val_30[i])
@@ -591,6 +592,67 @@ def compute_metrics(sample_pix_v, sample_pix_h, tile, end_d,end_m,end_y, end_dat
     
     
     pred_plots_pix(avg_pred_ann, avg_pred_cnn, avg_pred_ens, avg_pred_lstm,norm_ts_mm, win_l,start_idx, sample_pix_v, sample_pix_h, tile, avg_mse_ens)
+    
+    #----------------inverse prediction to ntl scale------
+    inversed_obs = mm_obj.inverse_transform(norm_ts_mm[win_l+start_idx:])
+    inversed_pred_ens = mm_obj.inverse_transform(avg_pred_ens)#using ens
+    inversed_pred_ann = mm_obj.inverse_transform(avg_pred_ann)
+    inversed_pred_cnn = mm_obj.inverse_transform(avg_pred_cnn)
+    inversed_pred_lstm = mm_obj.inverse_transform(avg_pred_lstm)
+    
+    plt.figure(figsize=(21,11))
+    plt.plot(inversed_obs,'k',label='observed')
+    plt.plot(inversed_pred_ens,'r',label='predicted')
+    #plt.xticks(ticks = years_tick_pos ,labels = years_tick, rotation = 0, fontsize=17)
+    plt.yticks(fontsize=17)
+    plt.legend(fontsize=17)
+    plt.ylabel('NTL(nW cm$^-$$^2$ sr$^-$$^1$)', fontsize=17)
+    #plt.savefig(os.path.join(write_dir_plots,UA+'_ens_pred_with_relu.png'), dpi=180)
+    plt.savefig(str(Path("/app/temp_data",f"fua_{sample_pix_v}_{sample_pix_h}_{tile}_ens_pred.png")), dpi=180)
+    plt.close()
+    
+    x=np.arange(0,inversed_obs.shape[0])
+    print('lengts',x,inversed_obs.shape[0])
+    plt.figure(figsize=(21,11))
+    plt.subplot(2,1,1)
+    plt.plot(inversed_obs,'k',label='observed')
+    plt.plot(inversed_pred_ens,'r',label='ensemble')
+    plt.plot(inversed_pred_ann,'b',label='ann')
+    plt.plot(inversed_pred_cnn,'m',label='cnn')
+    plt.plot(inversed_pred_lstm,'g',label='lstm')
+    #plt.xticks(ticks = years_tick_pos ,labels = years_tick, rotation = 0, fontsize=17)
+    plt.yticks(fontsize=17)
+    plt.legend(fontsize=17)
+    plt.ylabel('NTL(nW cm$^-$$^2$ sr$^-$$^1$)', fontsize=17)
+    plt.subplot(2,1,2)
+    plt.scatter(x,c_flag)
+    #plt.xticks(ticks = years_tick_pos ,labels = years_tick, rotation = 0, fontsize=17)
+    #plt.savefig(os.path.join(write_dir_plots,UA+'_ens_pred_with_flag.png'), dpi=180)
+    plt.savefig(str(Path("/app/temp_data",f"fua_{sample_pix_v}_{sample_pix_h}_{tile}_ens_pred_flag.png")), dpi=180)
+    plt.close()
+    #plt.close()
+    
+    plt.figure(figsize=(21,11))
+    plt.subplot(2,1,1)
+    plt.plot(inversed_obs[1500:1750,0],'k',label='observed')
+    plt.plot(inversed_pred_ens[1500:1750,0],'r',label='ensemble')
+    plt.plot(inversed_pred_ann[1500:1750,0],'b',label='ann')
+    plt.plot(inversed_pred_cnn[1500:1750,0],'m',label='cnn')
+    plt.plot(inversed_pred_lstm[1500:1750,0],'g',label='lstm')
+    #plt.xticks(ticks = years_tick_pos ,labels = years_tick, rotation = 0, fontsize=17)
+    plt.yticks(fontsize=17)
+    plt.legend(fontsize=17)
+    plt.ylabel('NTL(nW cm$^-$$^2$ sr$^-$$^1$)', fontsize=17)
+    plt.subplot(2,1,2)
+    plt.plot(avg_mse_ens[1500:1750])
+    #plt.xticks(ticks = years_tick_pos ,labels = years_tick, rotation = 0, fontsize=17)
+    #plt.savefig(os.path.join(write_dir_plots,UA+'_ens_pred_with_flag.png'), dpi=180)
+    plt.savefig(str(Path("/app/temp_data",f"fua_{sample_pix_v}_{sample_pix_h}_{tile}_ens_pred_clipped.png")), dpi=180)
+    plt.close()
+    
+    #np.savetxt(os.path.join(write_dir_plots,UA+'_ens_pred.csv'),inversed_pred_ens,fmt='%10.4f', delimiter=',', newline='\n',header='ntl_pred')
+    
+    
     
     
     #----------------top k mse from each method extracting threshold values------
